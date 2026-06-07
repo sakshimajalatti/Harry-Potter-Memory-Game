@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Memory Game</title>
+
+<style>
+body{
+    background: radial-gradient(circle,#1a1a2e,#16213e,#0f3460);
+    color:#0ff;
+    font-family: Arial, sans-serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    margin:0;
+}
+.game_container{
+    text-align: center;
+    background: rgba(0,0,0,0.5);
+    padding:20px;
+    border-radius:10px;
+    box-shadow: 0 0 15px #0ff;
+}
+.game_grid{
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap:10px;
+    margin-top:20px;
+}
+.card{
+    width:70px;
+    height:70px;
+    background: rgba(0,255,255,0.2);
+    border-radius:8px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:24px;
+    color:#0ff;
+    cursor:pointer;
+    transition:0.3s;
+}
+.card:hover{
+    box-shadow: 0 0 15px #0ff;
+}
+.card.flipped{
+    background: rgba(0,255,255,0.8);
+    color:#1a1a2e;
+    transform: rotateY(180deg);
+}
+#restart_btn{
+    margin-top:20px;
+    padding:10px 20px;
+    background:#0ff;
+    border:none;
+    border-radius:5px;
+    color:#1a1a2e;
+    cursor:pointer;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="game_container">
+    <h2>Nerdy Memory Game</h2>
+
+    <div class="game_grid"></div>
+
+    <div class="game_info">
+        <p>Moves: <span id="move_counter">0</span></p>
+        <p>Time: <span id="timer">00:00</span></p>
+        <button id="restart_btn">Restart Game</button>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    const grid = document.querySelector(".game_grid");
+    const restartbtn = document.getElementById("restart_btn");
+    const moveCounter = document.getElementById("move_counter");
+    const timer = document.getElementById("timer");
+
+    const symbols = ['🍎','🍌','🍇','🍓','🍍','🥝','🍒','🍉'];
+
+    let cards = [];
+    let flippedCards = [];
+    let moves = 0;
+    let time = 0;
+    let matchedPairs = 0;
+    let timerInterval;
+
+    function shuffleCards(){
+        cards = [...symbols, ...symbols];
+        cards.sort(() => Math.random() - 0.5);
+    }
+
+    function createBoard(){
+        grid.innerHTML = "";
+        shuffleCards();
+
+        cards.forEach(symbol => {
+            const card = document.createElement("div");
+            card.classList.add("card");
+            card.dataset.symbol = symbol;
+            card.innerHTML = "?";
+            card.addEventListener("click", flipCard);
+            grid.appendChild(card);
+        });
+    }
+
+    function flipCard(){
+        if(flippedCards.length < 2 && !this.classList.contains("flipped")){
+            this.classList.add("flipped");
+            this.innerHTML = this.dataset.symbol;
+            flippedCards.push(this);
+
+            if(flippedCards.length === 2){
+                setTimeout(checkMatch, 500);
+            }
+        }
+    }
+
+    function checkMatch(){
+        moves++;
+        moveCounter.textContent = moves;
+
+        if(flippedCards[0].dataset.symbol === flippedCards[1].dataset.symbol){
+            matchedPairs++;
+            flippedCards = [];
+
+            if(matchedPairs === symbols.length){
+                clearInterval(timerInterval);
+                setTimeout(() => {
+                    alert(`You won in ${moves} moves and ${formatTime(time)}!`);
+                }, 300);
+            }
+        } else {
+            flippedCards.forEach(card => {
+                card.classList.remove("flipped");
+                card.innerHTML = "?";
+            });
+            flippedCards = [];
+        }
+    }
+
+    function formatTime(seconds){
+        let min = String(Math.floor(seconds / 60)).padStart(2,'0');
+        let sec = String(seconds % 60).padStart(2,'0');
+        return `${min}:${sec}`;
+    }
+
+    function startGame(){
+        moves = 0;
+        time = 0;
+        matchedPairs = 0;
+        flippedCards = [];
+
+        moveCounter.textContent = "0";
+        timer.textContent = "00:00";
+
+        clearInterval(timerInterval);
+
+        createBoard();
+
+        // Start timer
+        timerInterval = setInterval(() => {
+            time++;
+            timer.textContent = formatTime(time);
+        }, 1000);
+    }
+
+    restartbtn.addEventListener("click", startGame);
+
+    startGame();
+});
+</script>
+
+</body>
+</html>
