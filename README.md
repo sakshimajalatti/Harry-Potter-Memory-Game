@@ -15,15 +15,15 @@ A Harry Potter themed memory matching game built with React.
 
 ### Game Board
 
-![Game Board](./screenshots/start-screen.png)
+![Game Board](./Screenshots/start-screen.png)
 
 ### Gameplay
 
-![Gameplay](./screenshots/play-screen.png)
+![Gameplay](./Screenshots/play-screen.png)
 
 ### Win Screen
 
-![Win Screen](./screenshots/win-screen.png)
+![Win Screen](./Screenshots/win-screen.png)
 
 ## Technologies Used
 
